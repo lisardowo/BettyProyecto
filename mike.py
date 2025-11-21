@@ -6,49 +6,49 @@ while opcion != 6:
 
 	match opcion:
 		case 1:  # Registro
-			ocupada = False
+			hayhuesped = False
 			huespedes = int(input("huespedes: "))
-			TotalApagar = 0
-			NumHab = int(input("Numero de la habitacion: "))
+			Total = 0
+			Habitacion = int(input("Numero de la habitacion: "))
             
 			f = open("registro.txt", "r")
 			for line in f:
-				if f"Numero de Habitacion: {NumHab}" in line:
-					ocupada = True
+				if f"Numero de Habitacion: {Habitacion}" in line:
+					hayhuesped = True
 					break
 			f.close()
-			if ocupada:
+			if hayhuesped:
 				print("Habitacion ya ocupada.")
 				continue
 
 			NumDias = int(input("Ingrese el numero de dias a hospedar: "))
 
 			if huespedes == 1:
-				TotalApagar += 1000
+				Total += 1000
 			elif huespedes == 2:
-				TotalApagar += 1500
+				Total += 1500
 			else:
 				for i in range(huespedes):
-					TotalApagar += 500
+					Total += 500
 
 			Nombre = input("Ingrese el nombre: ")
-			CdOrigen = input("Ingrese la Ciudad de origen: ")
+			Ciudad = input("Ingrese la Ciudad de origen: ")
 			FormaDepago = input("Ingrese la forma de pago:(Efectivo o Tarjeta) ")
 
 			f = open("registro.txt", "a")
 			f.write(
-				f"Numero de Habitacion: {NumHab}, Numero de Dias: {NumDias}, Numero de huespedes: {huespedes}, Total a Pagar: {TotalApagar * NumDias}, Forma de Pago: {FormaDepago}\n"
+				f"Numero de Habitacion: {Habitacion}, Numero de Dias: {NumDias}, Numero de huespedes: {huespedes}, Total a Pagar: {Total * NumDias}, Forma de Pago: {FormaDepago}\n"
 			)
 			f.close()
-			print(f"Registro exitoso, tu total a pagar es: {TotalApagar * NumDias}.")
+			
 
 		case 2:  # Busqueda
 			
-			NumHab = int(input("Ingrese el numero de habitacion a buscar: "))
+			Habitacion = int(input("Habitacion a buscar: "))
 			encontrado = None
 			f = open("registro.txt", "r")
 			for line in f:
-				if f"Numero de Habitacion: {NumHab}" in line:
+				if f"Numero de Habitacion: {Habitacion}" in line:
 					encontrado = line
 					break
 			f.close()
@@ -58,14 +58,14 @@ while opcion != 6:
 				print("Habitacion no encontrada.")
 
 		case 3:  # Reportes
-			opcion = input("a) Ver todos los registros b) Ver habitaciones ocupadas ").lower()
+			opcion = input("a) Ver todo b) Ver habitaciones ocupadas ").lower()
 			if opcion == "a":
 				f = open("registro.txt", "r")
 				for line in f:
 					print(line.rstrip())
 				f.close()
 			else:
-				occupied: list[int] = []
+				ocupada: list[int] = []
 				f = open("registro.txt", "r")
 				for line in f:
 					parts = line.split(",")
@@ -73,20 +73,20 @@ while opcion != 6:
 						if "Numero de Habitacion" in part:
 							
 								num_hab = int(part.split(":")[1].strip())
-								occupied.append(num_hab)
+								ocupada.append(num_hab)
 							
 				f.close()
 				print("H1 - H2 - H3 -H4 -H5 -H6 -H7 -H8 -H9 ")
-				for i in range(len(occupied)):
-					if i in occupied:
-						print("X || ", end="")
+				for i in range(len(ocupada)):
+					if i in ocupada:
+						print("1 - ", end="")
 					else:
-						print("O || ", end="")
+						print("O - ", end="")
 				print()
 
 		case 4:  # Modificaciones
 			
-			NumHab = int(input("Ingrese el numero de habitacion a modificar: "))
+			Habitacion = int(input("Ingrese el numero de habitacion a modificar: "))
 			# Leer todo y reescribir modificado
 			f = open("registro.txt", "r")
 			lines = f.readlines()
@@ -94,31 +94,23 @@ while opcion != 6:
 			nuevo_contenido = []
 			modificado = False
 			for line in lines:
-				if f"Numero de Habitacion: {NumHab}" in line and not modificado:
+				if f"Numero de Habitacion: {Habitacion}" in line and not modificado:
 					parts = line.split(",")
-					try:
-						NumDias = int(parts[1].split(":")[1].strip())
-						huespedes = int(parts[2].split(":")[1].strip())
-						TotalApagar = int(parts[3].split(":")[1].strip())
-						FormaDepago = parts[4].split(":")[1].strip()
-					except (ValueError, IndexError):
-						nuevo_contenido.append(line)
-						continue
+					NumDias = int(parts[1].split(":")[1].strip())
+					huespedes = int(parts[2].split(":")[1].strip())
+					Total = int(parts[3].split(":")[1].strip())
+					FormaDepago = parts[4].split(":")[1].strip()
 					print("Ingrese los nuevos datos.")
-					try:
-						DiasExtra = int(input("Ingrese el numero de dias extra de su estancia: "))
-					except ValueError:
-						print("Dias extra invalidos, se cancela modificacion.")
-						nuevo_contenido.append(line)
-						continue
+					
+					DiasExtra = int(input("Ingrese el numero de dias extra de su estancia: "))
 					# Recalcular total proporcional
 					if NumDias > 0:
-						tarifa_diaria = TotalApagar // NumDias
+						tarifa_diaria = Total // NumDias
 						nuevo_total = tarifa_diaria * (NumDias + DiasExtra)
 					else:
-						nuevo_total = TotalApagar
-					mods = f"Numero de Habitacion: {NumHab}, Numero de Dias: {NumDias + DiasExtra}, Numero de huespedes: {huespedes}, Total a Pagar: {nuevo_total}, Forma de Pago: {FormaDepago}\n"
-					nuevo_contenido.append(mods)
+						nuevo_total = Total
+					modificacion = f"Numero de Habitacion: {Habitacion}, Numero de Dias: {NumDias + DiasExtra}, Numero de huespedes: {huespedes}, Total a Pagar: {nuevo_total}, Forma de Pago: {FormaDepago}\n"
+					nuevo_contenido.append(modificacion)
 					modificado = True
 					print("Registro modificado exitosamente.")
 				else:
@@ -130,12 +122,12 @@ while opcion != 6:
 
 		case 5:  # Eliminar
 			encontrado = None
-			NumHab = int(input("Ingrese el numero de habitacion a buscar: "))
+			Habitacion = int(input("Ingrese el numero de habitacion a buscar: "))
 			f = open("registro.txt", "r")
 			texto = f.readlines()
 			f.close()
 			for linea in texto:
-				if f"Numero de Habitacion: {NumHab}" in linea:
+				if f"Numero de Habitacion: {Habitacion}" in linea:
 					encontrado = linea
 					break
 			if encontrado:
